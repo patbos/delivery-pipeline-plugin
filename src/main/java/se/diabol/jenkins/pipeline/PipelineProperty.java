@@ -36,6 +36,7 @@ public class PipelineProperty extends JobProperty<AbstractProject<?, ?>> {
 
     private String taskName = null;
     private String stageName = null;
+    private String taskNameMacro = null;
 
     public PipelineProperty() {
     }
@@ -62,6 +63,15 @@ public class PipelineProperty extends JobProperty<AbstractProject<?, ?>> {
 
     public final void setStageName(String stageName) {
         this.stageName = stageName;
+    }
+
+    @Exported
+    public String getTaskNameMacro() {
+        return taskNameMacro;
+    }
+
+    public void setTaskNameMacro(String taskNameMacro) {
+        this.taskNameMacro = taskNameMacro;
     }
 
     public static Set<String> getStageNames() {
@@ -129,7 +139,8 @@ public class PipelineProperty extends JobProperty<AbstractProject<?, ?>> {
 		public PipelineProperty newInstance(StaplerRequest sr, JSONObject formData) throws FormException {
 			String task = sr.getParameter("taskName");
 			String stage = sr.getParameter("stageName");
-			boolean configEnabled = sr.getParameter("enabled") != null;
+			String taskMacro = sr.getParameter("taskNameMacro");
+            boolean configEnabled = sr.getParameter("enabled") != null;
 			if (!configEnabled) {
 				return null;
 			}
@@ -139,10 +150,17 @@ public class PipelineProperty extends JobProperty<AbstractProject<?, ?>> {
 			if ("".equals(stage)) {
 				stage = null;
 			}
+            if ("".equals(taskMacro)) {
+                taskMacro = null;
+            }
 			if (task == null && stage == null) {
 				return null;
 			}
-			return new PipelineProperty(task, stage);
+
+            PipelineProperty property = new PipelineProperty(task, stage);
+            property.setTaskNameMacro(taskMacro);
+
+            return property;
 		}
     }
 }

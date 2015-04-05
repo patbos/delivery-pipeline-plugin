@@ -178,5 +178,53 @@ public class TaskTest {
 
     }
 
+    @Test
+    public void testMacroAsTaskName() throws Exception {
+        Task task = testTaskWithMacro("${TEST_MACRO}");
+        assertEquals("Macro Return", task.getName());
+    }
+
+    @Test
+    public void testMacroAsTaskNameIOException() throws Exception {
+        Task task = testTaskWithMacro("${TEST_MACRO, throwIO=true}");
+        assertEquals("task", task.getName());
+    }
+
+
+    @Test
+    public void testMacroAsTaskNameMacroEvaluationException() throws Exception {
+        Task task = testTaskWithMacro("${TEST_MACRO, throwEval=true}");
+        assertEquals("task", task.getName());
+    }
+
+    @Test
+    public void testMacroAsTaskNameInterruptException() throws Exception {
+        Task task = testTaskWithMacro("${TEST_MACRO, throwInterrupt=true}");
+        assertEquals("task", task.getName());
+    }
+
+    @Test
+    public void testMacroAsTaskNameReturnsEmptyString() throws Exception {
+        Task task = testTaskWithMacro("${TEST_MACRO, returnEmpty=true}");
+        assertEquals("task", task.getName());
+    }
+
+    @Test
+    public void testMacroAsTaskNameReturnsNull() throws Exception {
+        Task task = testTaskWithMacro("${TEST_MACRO, returnNull=true}");
+        assertEquals("task", task.getName());
+    }
+
+    private Task testTaskWithMacro(String macro) throws Exception {
+        jenkins.setQuietPeriod(0);
+        FreeStyleProject project = jenkins.createFreeStyleProject("project");
+        PipelineProperty property = new PipelineProperty("task", "stage");
+        property.setTaskNameMacro(macro);
+        project.addProperty(property);
+        FreeStyleBuild build = jenkins.buildAndAssertSuccess(project);
+
+        Task prototype = Task.getPrototypeTask(project, true);
+        return prototype.getLatestTask(jenkins.getInstance(), build);
+    }
 
 }

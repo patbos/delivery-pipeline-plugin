@@ -1,5 +1,4 @@
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout"
-         xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+<j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
 
     <f:optionalBlock name="enabled" title="Delivery Pipeline configuration" inline="true" checked="${instance != null}">
             <f:entry title="Stage Name" field="stageName">
@@ -8,6 +7,9 @@
 
             <f:entry title="Task Name" field="taskName">
                 <f:textbox name="taskName" value="${instance.getTaskName()}"/>
+            </f:entry>
+            <f:entry title="Task Name Macro" field="taskNameMaco">
+                <f:textbox name="taskNameMacro" value="${instance.getTaskNameMacro()}"/>
             </f:entry>
     </f:optionalBlock>
 </j:jelly>
