@@ -239,6 +239,7 @@ public class Stage extends AbstractItem {
         for (int row = allPaths.size() - 1; row >= 0; row--) {
             List<Stage> path = allPaths.get(row);
             for (int column = 0; column < path.size(); column++) {
+
                 Stage stage = path.get(column);
                 stage.setColumn(Math.max(stage.getColumn(), column));
                 stage.setRow(row);
@@ -246,6 +247,9 @@ public class Stage extends AbstractItem {
         }
         List<Stage> result = new ArrayList<Stage>(stages);
 
+
+        sortByRowsCols(result);
+        col(result);
         sortByRowsCols(result);
 
         return result;
@@ -268,6 +272,46 @@ public class Stage extends AbstractItem {
             }
         }
         return result;
+    }
+
+    private static void col(List<Stage> stages) {
+
+        List<List<Stage>> matrix = new ArrayList<List<Stage>>();
+        for (int i = 0; i < stages.size(); i++) {
+            Stage stage = stages.get(i);
+            List<Stage> row;
+            if (stage.getRow() + 1 > matrix.size()) {
+                row = new ArrayList<Stage>();
+                matrix.add(row);
+            } else {
+                row = matrix.get(stage.getRow());
+            }
+            row.add(stage);
+        }
+
+
+        for (int i = 1; i < matrix.size(); i++) {
+            List<Stage> prev = matrix.get(i - 1);
+            List<Stage> current = matrix.get(i);
+            if (fit(prev, current)) {
+                for (Stage stage : current) {
+                    stage.setRow(stage.getRow() - 1);
+                }
+            }
+
+        }
+    }
+
+    private static boolean fit(List<Stage> prev, List<Stage> current) {
+        for (Stage currentStage : current) {
+            for (Stage prevStage : prev) {
+                if (currentStage.getColumn() == prevStage.getColumn()) {
+                    return false;
+                }
+
+            }
+        }
+        return true;
     }
 
     private static List<List<Stage>> findAllRunnablePaths(Stage start, DirectedGraph<Stage, Edge> graph) {
@@ -365,6 +409,8 @@ public class Stage extends AbstractItem {
                 .add("name", getName())
                 .add("version", getVersion())
                 .add("tasks", getTasks())
+                .add("row", getRow())
+                .add("col", getColumn())
                 .toString();
     }
 }

@@ -22,6 +22,8 @@ import hudson.matrix.Axis;
 import hudson.matrix.AxisList;
 import hudson.matrix.MatrixConfiguration;
 import hudson.matrix.MatrixProject;
+import hudson.model.FreeStyleProject;
+import hudson.tasks.BuildTrigger;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.Bug;
@@ -200,6 +202,36 @@ public class StageTest {
             Stage stage = stages.get(0);
             assertEquals("stage", stage.getName());
 
+        }
+    }
+
+    /**
+     *  A --> B --> C --> D
+     *     |     ||    |
+     *     -> E - -> F -
+     */
+    @Test
+    //TODO rename and fix testcase
+    public void test() throws Exception {
+        FreeStyleProject a = jenkins.createFreeStyleProject("A");
+        FreeStyleProject b = jenkins.createFreeStyleProject("B");
+        FreeStyleProject c = jenkins.createFreeStyleProject("C");
+        FreeStyleProject d = jenkins.createFreeStyleProject("D");
+        FreeStyleProject e = jenkins.createFreeStyleProject("E");
+        FreeStyleProject f = jenkins.createFreeStyleProject("F");
+
+        a.getPublishersList().add(new BuildTrigger("B,E", false));
+        b.getPublishersList().add(new BuildTrigger("C,F", false));
+        c.getPublishersList().add(new BuildTrigger("D", false));
+        e.getPublishersList().add(new BuildTrigger("C", false));
+        f.getPublishersList().add(new BuildTrigger("D", false));
+
+        jenkins.getInstance().rebuildDependencyGraph();
+
+        List<Stage> stages = Stage.extractStages(a);
+        for (int i = 0; i < stages.size(); i++) {
+            Stage stage = stages.get(i);
+            System.out.println(stage.getName() + " " + stage.getRow() + " " + stage.getColumn());
         }
 
     }
