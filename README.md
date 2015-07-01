@@ -10,6 +10,17 @@ For info see the [Delivery Pipeline Plugin - Wiki](https://wiki.jenkins-ci.org/d
 
 Contributed by [Diabol AB](http://www.diabol.se)
 
+How to contribute
+===
+Contributions are welcome!
+
+1. Fork it
+2. Create or work on a Jira issue
+3. Make sure to add the issue number in the commit message together with a descriptive message of the functionality or bug fix.
+4. Please add as much unit testing as possible to the added code, this makes it much simpler to maintain.
+5. Create a PR to get feedback from maintainers
+6. To get the PR merged to master and released please squash the commits into one.
+
 Build
 ---
 
