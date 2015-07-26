@@ -17,7 +17,15 @@ If not, see <http://www.gnu.org/licenses/>.
 */
 package se.diabol.jenkins.pipeline.domain;
 
+import static com.google.common.base.Objects.toStringHelper;
+import static com.google.common.base.Strings.isNullOrEmpty;
+import static com.google.common.collect.Iterables.concat;
+import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Maps.newLinkedHashMap;
+import static java.util.Collections.singleton;
+
 import com.google.common.collect.ImmutableList;
+
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.ItemGroup;
@@ -43,13 +51,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static com.google.common.base.Objects.toStringHelper;
-import static com.google.common.base.Strings.isNullOrEmpty;
-import static com.google.common.collect.Iterables.concat;
-import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Maps.newLinkedHashMap;
-import static java.util.Collections.singleton;
-
 @ExportedBean(defaultVisibility = AbstractItem.VISIBILITY)
 public class Stage extends AbstractItem {
     private List<Task> tasks;
@@ -69,12 +70,12 @@ public class Stage extends AbstractItem {
     }
 
     private Stage(Stage stage, List<Task> tasks, String version, long id) {
-        this(stage.getName(), tasks, stage.getDownstreamStages(), stage.getDownstreamStageIds(), stage.getTaskConnections(), version,
-                stage.getRow(), stage.getColumn(), id);
+        this(stage.getName(), tasks, stage.getDownstreamStages(), stage.getDownstreamStageIds(),
+                stage.getTaskConnections(), version, stage.getRow(), stage.getColumn(), id);
     }
 
-    private Stage(String name, List<Task> tasks, List<String> downstreamStages, List<Long> downstreamStageIds, Map<String,
-            List<String>> taskConnections, String version, int row, int column, long id) {
+    private Stage(String name, List<Task> tasks, List<String> downstreamStages, List<Long> downstreamStageIds,
+                  Map<String, List<String>> taskConnections, String version, int row, int column, long id) {
         super(name);
         this.tasks = tasks;
         this.version = version;
@@ -156,7 +157,8 @@ public class Stage extends AbstractItem {
             Task task = Task.getPrototypeTask(project, project.getFullName().equals(firstProject.getFullName()));
             PipelineProperty property = (PipelineProperty) project.getProperty(PipelineProperty.class);
             if (property == null && project.getParent() instanceof AbstractProject) {
-                property = (PipelineProperty) ((AbstractProject) project.getParent()).getProperty(PipelineProperty.class);
+                property = (PipelineProperty) ((AbstractProject) project.getParent())
+                        .getProperty(PipelineProperty.class);
             }
             String stageName = property != null && !isNullOrEmpty(property.getStageName())
                     ? property.getStageName() : project.getDisplayName();
@@ -200,12 +202,13 @@ public class Stage extends AbstractItem {
     }
 
 
-    public static List<Stage> placeStages(AbstractProject firstProject, Collection<Stage> stages) throws PipelineException {
+    public static List<Stage> placeStages(AbstractProject firstProject, Collection<Stage> stages)
+            throws PipelineException {
         DirectedGraph<Stage, Edge> graph = new SimpleDirectedGraph<Stage, Edge>(new StageEdgeFactory());
         for (Stage stage : stages) {
             stage.setTaskConnections(getStageConnections(stage, stages));
             graph.addVertex(stage);
-            List<Stage> downstreamStages = getDownstreamStages(stage, stages);
+            List<Stage> downstreamStages = getDownstreamStagesForStage(stage, stages);
             List<String> downstreamStageNames = new ArrayList<String>();
             List<Long> downstreamStageIds = new ArrayList<Long>();
             for (Stage downstream : downstreamStages) {
@@ -230,7 +233,8 @@ public class Stage extends AbstractItem {
         }
 
 
-        List<List<Stage>> allPaths = findAllRunnablePaths(findStageForJob(firstProject.getRelativeNameFrom(Jenkins.getInstance()), stages), graph);
+        List<List<Stage>> allPaths = findAllRunnablePaths(
+                findStageForJob(firstProject.getRelativeNameFrom(Jenkins.getInstance()), stages), graph);
         Collections.sort(allPaths, new Comparator<List<Stage>>() {
             public int compare(List<Stage> stages1, List<Stage> stages2) {
                 return stages2.size() - stages1.size();
@@ -303,7 +307,7 @@ public class Stage extends AbstractItem {
     }
 
 
-    private static List<Stage> getDownstreamStages(Stage stage, Collection<Stage> stages) {
+    private static List<Stage> getDownstreamStagesForStage(Stage stage, Collection<Stage> stages) {
         List<Stage> result = newArrayList();
         for (int i = 0; i < stage.getTasks().size(); i++) {
             Task task = stage.getTasks().get(i);

@@ -17,6 +17,11 @@ If not, see <http://www.gnu.org/licenses/>.
 */
 package se.diabol.jenkins.pipeline.domain;
 
+import static com.google.common.base.Objects.toStringHelper;
+import static com.google.common.base.Strings.isNullOrEmpty;
+import static se.diabol.jenkins.pipeline.domain.status.StatusFactory.disabled;
+import static se.diabol.jenkins.pipeline.domain.status.StatusFactory.idle;
+
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.Item;
@@ -34,11 +39,6 @@ import se.diabol.jenkins.pipeline.util.ProjectUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.google.common.base.Strings.isNullOrEmpty;
-import static se.diabol.jenkins.pipeline.domain.status.StatusFactory.disabled;
-import static se.diabol.jenkins.pipeline.domain.status.StatusFactory.idle;
-import static com.google.common.base.Objects.toStringHelper;
-
 
 @ExportedBean(defaultVisibility = AbstractItem.VISIBILITY)
 public class Task extends AbstractItem {
@@ -53,8 +53,8 @@ public class Task extends AbstractItem {
     private final String description;
     private final AbstractProject project;
     
-    public Task(AbstractProject project, String id, String name, Status status, String link, ManualStep manual, List<String> downstreamTasks,
-                boolean initial, String description) {
+    public Task(AbstractProject project, String id, String name, Status status, String link, ManualStep manual,
+                List<String> downstreamTasks, boolean initial, String description) {
         super(name);
         this.id = id;
         this.link = link;
@@ -124,7 +124,7 @@ public class Task extends AbstractItem {
         return downstreamTasks;
     }
 
-	@Exported
+    @Exported
     public String getDescription() {
         return description;
     }
@@ -187,11 +187,13 @@ public class Task extends AbstractItem {
             }
         }
 
-        String taskBuildId = build == null || taskStatus.isIdle() || taskStatus.isQueued() ? null : String.valueOf(build.getNumber());
+        String taskBuildId = build == null || taskStatus.isIdle()
+                || taskStatus.isQueued() ? null : String.valueOf(build.getNumber());
         ManualStep manualStep = ManualStep.getManualStepLatest(project, build, firstBuild);
 
         final String buildDescription = (build != null) ? build.getDescription() : "";
-        return new Task(this, taskBuildId, taskStatus, taskLink, manualStep, TestResult.getTestResult(build), buildDescription);
+        return new Task(this, taskBuildId, taskStatus, taskLink, manualStep, TestResult.getTestResult(build),
+                buildDescription);
     }
 
     public Task getAggregatedTask(AbstractBuild versionBuild, ItemGroup context) {

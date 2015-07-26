@@ -26,7 +26,8 @@ import se.diabol.jenkins.pipeline.domain.Component;
 
 import java.util.Comparator;
 
-public abstract class ComponentComparator implements Comparator<Component>, ExtensionPoint, Describable<ComponentComparator> {
+public abstract class ComponentComparator implements Comparator<Component>, ExtensionPoint,
+        Describable<ComponentComparator> {
 
     @Override
     public Descriptor<ComponentComparator> getDescriptor() {

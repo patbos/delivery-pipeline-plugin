@@ -79,7 +79,8 @@ public class PipelineVersionContributor extends BuildWrapper {
         }
         return new Environment() {
             @Override
-            public boolean tearDown(AbstractBuild build, BuildListener listener) throws IOException, InterruptedException {
+            public boolean tearDown(AbstractBuild build, BuildListener listener) throws IOException,
+                    InterruptedException {
                 return true;
             }
         };

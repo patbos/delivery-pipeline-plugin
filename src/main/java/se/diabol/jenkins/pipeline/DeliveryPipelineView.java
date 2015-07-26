@@ -57,7 +57,6 @@ import se.diabol.jenkins.pipeline.trigger.TriggerException;
 import se.diabol.jenkins.pipeline.util.PipelineUtils;
 import se.diabol.jenkins.pipeline.util.ProjectUtil;
 
-import javax.servlet.ServletException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -71,6 +70,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+import javax.servlet.ServletException;
 
 @SuppressWarnings("UnusedDeclaration")
 public class DeliveryPipelineView extends View {
@@ -302,27 +302,26 @@ public class DeliveryPipelineView extends View {
     }
 
     @Exported
-	public boolean isShowDescription()
-	{
-		return showDescription;
-	}
+    public boolean isShowDescription() {
+        return showDescription;
+    }
 
     @Exported
     public boolean isShowPromotions() {
         return showPromotions;
     }
 
-    public void setShowDescription(boolean showDescription)
-	{
-		this.showDescription = showDescription;
-	}
+    public void setShowDescription(boolean showDescription) {
+        this.showDescription = showDescription;
+    }
 
     public void setShowPromotions(boolean showPromotions) {
         this.showPromotions = showPromotions;
     }
 
     @JavaScriptMethod
-    public void triggerManual(String projectName, String upstreamName, String buildId) throws TriggerException, AuthenticationException {
+    public void triggerManual(String projectName, String upstreamName, String buildId) throws
+            TriggerException, AuthenticationException {
         try {
             LOG.fine("Trigger manual build " + projectName + " " + upstreamName + " " + buildId);
             AbstractProject project = ProjectUtil.getProject(projectName, Jenkins.getInstance());
@@ -334,8 +333,8 @@ public class DeliveryPipelineView extends View {
             if (trigger != null) {
                 trigger.triggerManual(project, upstream, buildId, getOwner().getItemGroup());
             } else {
-                String message = "Trigger not found for manual build " + projectName + " for upstream " +
-                                        upstreamName + " id: " + buildId;
+                String message = "Trigger not found for manual build " + projectName + " for upstream "
+                        + upstreamName + " id: " + buildId;
                 LOG.log(Level.WARNING, message);
                 throw new TriggerException(message);
             }
@@ -364,8 +363,10 @@ public class DeliveryPipelineView extends View {
         project.scheduleBuild2(project.getQuietPeriod(),null, causeAction, build.getAction(ParametersAction.class));
     }
 
-    protected static String triggerExceptionMessage(final String projectName, final String upstreamName, final String buildId) {
-        String message = "Could not trigger manual build " + projectName + " for upstream " + upstreamName + " id: " + buildId;
+    protected static String triggerExceptionMessage(final String projectName, final String upstreamName,
+                                                    final String buildId) {
+        String message = "Could not trigger manual build " + projectName + " for upstream " + upstreamName + " id: "
+                + buildId;
         if (projectName.contains("/")) {
             message += ". Did you mean to specify " + withoutFolderPrefix(projectName) + "?";
         }
@@ -414,7 +415,8 @@ public class DeliveryPipelineView extends View {
         }
     }
 
-    private Component getComponent(String name, AbstractProject firstJob, boolean showAggregatedPipeline) throws PipelineException {
+    private Component getComponent(String name, AbstractProject firstJob, boolean showAggregatedPipeline)
+            throws PipelineException {
         Pipeline pipeline = Pipeline.extractPipeline(name, firstJob);
         List<Pipeline> pipelines = new ArrayList<Pipeline>();
         if (showAggregatedPipeline) {
@@ -441,7 +443,8 @@ public class DeliveryPipelineView extends View {
 
         }
         for (AbstractProject project : projects) {
-            Collection<AbstractProject<?, ?>> downstreamProjects = ProjectUtil.getAllDownstreamProjects(project).values();
+            Collection<AbstractProject<?, ?>> downstreamProjects =
+                    ProjectUtil.getAllDownstreamProjects(project).values();
             for (AbstractProject<?, ?> abstractProject : downstreamProjects) {
                 result.add(getItem(abstractProject.getName()));
             }
@@ -495,7 +498,8 @@ public class DeliveryPipelineView extends View {
         }
 
         public ListBoxModel doFillSortingItems() {
-            DescriptorExtensionList<ComponentComparator, ComponentComparatorDescriptor> descriptors = ComponentComparator.all();
+            DescriptorExtensionList<ComponentComparator, ComponentComparatorDescriptor> descriptors =
+                    ComponentComparator.all();
             ListBoxModel options = new ListBoxModel();
             options.add("None", NONE_SORTER);
             for (ComponentComparatorDescriptor descriptor : descriptors) {

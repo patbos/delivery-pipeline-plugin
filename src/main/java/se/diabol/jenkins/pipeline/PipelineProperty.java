@@ -18,7 +18,11 @@ If not, see <http://www.gnu.org/licenses/>.
 package se.diabol.jenkins.pipeline;
 
 import hudson.Extension;
-import hudson.model.*;
+import hudson.model.AbstractProject;
+import hudson.model.AutoCompletionCandidates;
+import hudson.model.Job;
+import hudson.model.JobProperty;
+import hudson.model.JobPropertyDescriptor;
 import hudson.util.FormValidation;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
@@ -80,8 +84,8 @@ public class PipelineProperty extends JobProperty<AbstractProject<?, ?>> {
 
     @Extension
     public static final class DescriptorImpl extends JobPropertyDescriptor {
-    	
-    	@Override
+
+        @Override
         public String getDisplayName() {
             return "Pipeline description";
         }
@@ -93,15 +97,15 @@ public class PipelineProperty extends JobProperty<AbstractProject<?, ?>> {
 
         public AutoCompletionCandidates doAutoCompleteStageName(@QueryParameter String value) {
             if (value != null) {
-                AutoCompletionCandidates c = new AutoCompletionCandidates();
+                AutoCompletionCandidates candidates = new AutoCompletionCandidates();
                 Set<String> stages = getStageNames();
 
                 for (String stage : stages) {
                     if (stage.toLowerCase().startsWith(value.toLowerCase())) {
-                        c.add(stage);
+                        candidates.add(stage);
                     }
                 }
-                return c;
+                return candidates;
             } else {
                 return new AutoCompletionCandidates();
             }
@@ -125,24 +129,24 @@ public class PipelineProperty extends JobProperty<AbstractProject<?, ?>> {
             return FormValidation.ok();
         }
 
-		@Override
-		public PipelineProperty newInstance(StaplerRequest sr, JSONObject formData) throws FormException {
-			String task = sr.getParameter("taskName");
-			String stage = sr.getParameter("stageName");
-			boolean configEnabled = sr.getParameter("enabled") != null;
-			if (!configEnabled) {
-				return null;
-			}
-			if ("".equals(task)) {
-				task = null;
-			}
-			if ("".equals(stage)) {
-				stage = null;
-			}
-			if (task == null && stage == null) {
-				return null;
-			}
-			return new PipelineProperty(task, stage);
-		}
+        @Override
+        public PipelineProperty newInstance(StaplerRequest sr, JSONObject formData) throws FormException {
+            String task = sr.getParameter("taskName");
+            String stage = sr.getParameter("stageName");
+            boolean configEnabled = sr.getParameter("enabled") != null;
+            if (!configEnabled) {
+                return null;
+            }
+            if ("".equals(task)) {
+                task = null;
+            }
+            if ("".equals(stage)) {
+                stage = null;
+            }
+            if (task == null && stage == null) {
+                return null;
+            }
+            return new PipelineProperty(task, stage);
+        }
     }
 }

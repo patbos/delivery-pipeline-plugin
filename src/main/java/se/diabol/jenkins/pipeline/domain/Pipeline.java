@@ -17,6 +17,9 @@ If not, see <http://www.gnu.org/licenses/>.
 */
 package se.diabol.jenkins.pipeline.domain;
 
+import static com.google.common.base.Objects.toStringHelper;
+import static com.google.common.collect.Lists.newArrayList;
+
 import com.google.common.collect.ImmutableList;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
@@ -31,9 +34,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import static com.google.common.base.Objects.toStringHelper;
-import static com.google.common.collect.Lists.newArrayList;
 
 @ExportedBean(defaultVisibility = AbstractItem.VISIBILITY)
 public class Pipeline extends AbstractItem {
@@ -176,7 +176,7 @@ public class Pipeline extends AbstractItem {
     }
 
     /**
-     * Created a pipeline prototype for the supplied first project
+     * Created a pipeline prototype for the supplied first project.
      */
     public static Pipeline extractPipeline(String name, AbstractProject<?, ?> firstProject) throws PipelineException {
         return new Pipeline(name, firstProject, newArrayList(Stage.extractStages(firstProject)));
@@ -204,9 +204,8 @@ public class Pipeline extends AbstractItem {
             for (Stage stage : getStages()) {
                 pipelineStages.add(stage.createLatestStage(context, null));
             }
-            Pipeline pipelineLatest = new Pipeline(getName(), firstProject, "#" + firstProject.getNextBuildNumber(), pipeLineTimestamp,
-                    Trigger.getTriggeredBy(firstProject, null), null,
-                    pipelineStages, false);
+            Pipeline pipelineLatest = new Pipeline(getName(), firstProject, "#" + firstProject.getNextBuildNumber(),
+                    pipeLineTimestamp, Trigger.getTriggeredBy(firstProject, null), null, pipelineStages, false);
             result.add(pipelineLatest);
             no--;
         }
@@ -221,8 +220,9 @@ public class Pipeline extends AbstractItem {
             for (Stage stage : getStages()) {
                 pipelineStages.add(stage.createLatestStage(context, firstBuild));
             }
-            Pipeline pipelineLatest = new Pipeline(getName(), firstProject, firstBuild.getDisplayName(), pipeLineTimestamp,
-                                Trigger.getTriggeredBy(firstProject, firstBuild), UserInfo.getContributors(firstBuild), pipelineStages, false);
+            Pipeline pipelineLatest = new Pipeline(getName(), firstProject, firstBuild.getDisplayName(),
+                    pipeLineTimestamp, Trigger.getTriggeredBy(firstProject, firstBuild),
+                    UserInfo.getContributors(firstBuild), pipelineStages, false);
             pipelineLatest.setChanges(pipelineChanges);
             pipelineLatest.calculateTotalBuildTime();
             result.add(pipelineLatest);

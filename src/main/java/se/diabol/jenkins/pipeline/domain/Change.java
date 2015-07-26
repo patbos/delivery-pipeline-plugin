@@ -81,14 +81,14 @@ public class Change {
                         changeLink = link.toExternalForm();
                     }
                 } catch (IOException e) {
-                   LOG.log(Level.WARNING, "Could not get changeset link for: " + build.getProject().getFullDisplayName() + " " + build.getDisplayName(), e);
+                    LOG.log(Level.WARNING, "Could not get changeset link for: "
+                            + build.getProject().getFullDisplayName() + " " + build.getDisplayName(), e);
                 }
             }
             result.add(new Change(user, entry.getMsg(), entry.getCommitId(), changeLink));
         }
         return result;
     }
-
 
 
 }

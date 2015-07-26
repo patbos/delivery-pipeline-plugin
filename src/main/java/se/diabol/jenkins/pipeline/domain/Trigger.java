@@ -77,12 +77,14 @@ public class Trigger {
 
         for (Cause cause : causes) {
             if (cause instanceof Cause.UserIdCause) {
-                result.add(new Trigger(Trigger.TYPE_MANUAL, "user " + getDisplayName(((Cause.UserIdCause) cause).getUserName())));
+                result.add(new Trigger(Trigger.TYPE_MANUAL, "user "
+                        + getDisplayName(((Cause.UserIdCause) cause).getUserName())));
             } else if (cause instanceof Cause.RemoteCause) {
                 result.add(new Trigger(Trigger.TYPE_REMOTE, "remote trigger"));
             } else if (cause instanceof Cause.UpstreamCause) {
                 Cause.UpstreamCause upstreamCause = (Cause.UpstreamCause) cause;
-                AbstractProject upstreamProject = Jenkins.getInstance().getItem(upstreamCause.getUpstreamProject(), Jenkins.getInstance(), AbstractProject.class);
+                AbstractProject upstreamProject = Jenkins.getInstance().getItem(upstreamCause.getUpstreamProject(),
+                        Jenkins.getInstance(), AbstractProject.class);
                 StringBuilder causeString = new StringBuilder("upstream project");
                 if (upstreamProject != null) {
 
@@ -116,14 +118,14 @@ public class Trigger {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
+    public boolean equals(Object obj) {
+        if (this == obj) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()){
+        if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
-        Trigger trigger = (Trigger) o;
+        Trigger trigger = (Trigger) obj;
 
         return description.equals(trigger.description) && type.equals(trigger.type);
 

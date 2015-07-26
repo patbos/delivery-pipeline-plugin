@@ -79,7 +79,8 @@ public class ManualStep {
     }
 
 
-    public static ManualStep getManualStepLatest(AbstractProject project, AbstractBuild build, AbstractBuild firstBuild) {
+    public static ManualStep getManualStepLatest(AbstractProject project, AbstractBuild build,
+                                                 AbstractBuild firstBuild) {
         if (isManualTrigger(project)) {
 
             List<AbstractProject> upstreams = getUpstreamManualTriggered(project);
@@ -88,16 +89,24 @@ public class ManualStep {
                 @SuppressWarnings("unchecked")
                 AbstractBuild upstreamBuild = BuildUtil.match(upstream.getBuilds(), firstBuild);
                 if (build == null) {
-                    if (upstreamBuild != null && !upstreamBuild.isBuilding() && !ProjectUtil.isQueued(project, firstBuild)) {
-                        return new ManualStep(upstream.getRelativeNameFrom(Jenkins.getInstance()), String.valueOf(upstreamBuild.getNumber()), !upstreamBuild.getResult().isWorseThan(Result.UNSTABLE), project.hasPermission(Item.BUILD), null);
+                    if (upstreamBuild != null && !upstreamBuild.isBuilding()
+                            && !ProjectUtil.isQueued(project, firstBuild)) {
+                        return new ManualStep(upstream.getRelativeNameFrom(Jenkins.getInstance()),
+                                String.valueOf(upstreamBuild.getNumber()),
+                                !upstreamBuild.getResult().isWorseThan(Result.UNSTABLE),
+                                project.hasPermission(Item.BUILD), null);
                     }
                 } else {
-                    if (upstreamBuild != null && !build.isBuilding() && !ProjectUtil.isQueued(project, firstBuild) && build.getResult().isWorseThan(Result.UNSTABLE)) {
-                        return new ManualStep(upstream.getRelativeNameFrom(Jenkins.getInstance()), String.valueOf(upstreamBuild.getNumber()), true, project.hasPermission(Item.BUILD), null);
+                    if (upstreamBuild != null && !build.isBuilding() && !ProjectUtil.isQueued(project, firstBuild)
+                            && build.getResult().isWorseThan(Result.UNSTABLE)) {
+                        return new ManualStep(upstream.getRelativeNameFrom(Jenkins.getInstance()),
+                                String.valueOf(upstreamBuild.getNumber()), true,
+                                project.hasPermission(Item.BUILD), null);
                     }
                 }
                 if (i == upstreams.size() - 1) {
-                    return new ManualStep(upstream.getRelativeNameFrom(Jenkins.getInstance()), null, false, project.hasPermission(Item.BUILD), null);
+                    return new ManualStep(upstream.getRelativeNameFrom(Jenkins.getInstance()), null, false,
+                            project.hasPermission(Item.BUILD), null);
                 }
             }
         }
