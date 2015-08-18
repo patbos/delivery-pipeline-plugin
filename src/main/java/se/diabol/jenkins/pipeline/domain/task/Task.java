@@ -17,6 +17,11 @@ If not, see <http://www.gnu.org/licenses/>.
 */
 package se.diabol.jenkins.pipeline.domain.task;
 
+import static com.google.common.base.Objects.toStringHelper;
+import static com.google.common.base.Strings.isNullOrEmpty;
+import static se.diabol.jenkins.pipeline.domain.status.StatusFactory.disabled;
+import static se.diabol.jenkins.pipeline.domain.status.StatusFactory.idle;
+
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.Item;
@@ -212,6 +217,7 @@ public class Task extends AbstractItem {
     private String resolveTaskName(AbstractProject<?, ?> project, String name) {
         return (TokenUtils.stringIsNotEmpty(name) ? name : project.getDisplayName());
     }
+
     private String getExpandedName(AbstractBuild<?, ?> build) {
         return TokenUtils.decodedTemplate(build, this.getName());
     }
