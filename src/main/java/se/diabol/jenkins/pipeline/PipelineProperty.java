@@ -40,14 +40,16 @@ public class PipelineProperty extends JobProperty<AbstractProject<?, ?>> {
 
     private String taskName = null;
     private String stageName = null;
+    private String descriptionTemplate = null;
 
     public PipelineProperty() {
     }
 
     @DataBoundConstructor
-    public PipelineProperty(String taskName, String stageName) {
+    public PipelineProperty(String taskName, String stageName, String descriptionTemplate) {
         setStageName(stageName);
         setTaskName(taskName);
+        setDescriptionTemplate(descriptionTemplate);
     }
 
     @Exported
@@ -60,12 +62,21 @@ public class PipelineProperty extends JobProperty<AbstractProject<?, ?>> {
         return stageName;
     }
 
+    @Exported
+    public String getDescriptionTemplate() {
+        return descriptionTemplate;
+    }
+
     public final void setTaskName(String taskName) {
         this.taskName = taskName;
     }
 
     public final void setStageName(String stageName) {
         this.stageName = stageName;
+    }
+
+    public void setDescriptionTemplate(String descriptionTemplate) {
+        this.descriptionTemplate = descriptionTemplate;
     }
 
     public static Set<String> getStageNames() {
@@ -80,7 +91,6 @@ public class PipelineProperty extends JobProperty<AbstractProject<?, ?>> {
         }
         return result;
     }
-
 
     @Extension
     public static final class DescriptorImpl extends JobPropertyDescriptor {
@@ -133,6 +143,7 @@ public class PipelineProperty extends JobProperty<AbstractProject<?, ?>> {
         public PipelineProperty newInstance(StaplerRequest sr, JSONObject formData) throws FormException {
             String task = sr.getParameter("taskName");
             String stage = sr.getParameter("stageName");
+            String description = sr.getParameter("descriptionTemplate");
             boolean configEnabled = sr.getParameter("enabled") != null;
             if (!configEnabled) {
                 return null;
@@ -143,10 +154,13 @@ public class PipelineProperty extends JobProperty<AbstractProject<?, ?>> {
             if ("".equals(stage)) {
                 stage = null;
             }
+            if ("".equals(description)) {
+                description = null;
+            }
             if (task == null && stage == null) {
                 return null;
             }
-            return new PipelineProperty(task, stage);
+            return new PipelineProperty(task, stage, description);
         }
     }
 }
