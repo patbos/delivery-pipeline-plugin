@@ -317,7 +317,8 @@ public class DeliveryPipelineView extends View {
         return showPromotions;
     }
 
-    public void setShowDescription(boolean showDescription) {
+    public void setShowDescription(boolean showDescription)
+    {
         this.showDescription = showDescription;
     }
 
@@ -393,8 +394,7 @@ public class DeliveryPipelineView extends View {
                     AbstractProject firstJob = ProjectUtil.getProject(componentSpec.getFirstJob(), getOwnerItemGroup());
                     AbstractProject lastJob = ProjectUtil.getProject(componentSpec.getLastJob(), getOwnerItemGroup());
                     if (firstJob != null) {
-                        components.add(getComponent(componentSpec.getName(), firstJob,
-                                lastJob, showAggregatedPipeline));
+                        components.add(getComponent(componentSpec.getName(), firstJob, lastJob, showAggregatedPipeline));
                     } else {
                         throw new PipelineException("Could not find project: " + componentSpec.getFirstJob());
                     }
@@ -423,8 +423,7 @@ public class DeliveryPipelineView extends View {
         }
     }
 
-    private Component getComponent(String name, AbstractProject firstJob, AbstractProject lastJob,
-                                   boolean showAggregatedPipeline) throws PipelineException {
+    private Component getComponent(String name, AbstractProject firstJob, AbstractProject lastJob, boolean showAggregatedPipeline) throws PipelineException {
         Pipeline pipeline = Pipeline.extractPipeline(name, firstJob, lastJob);
         List<Pipeline> pipelines = new ArrayList<Pipeline>();
         if (showAggregatedPipeline) {

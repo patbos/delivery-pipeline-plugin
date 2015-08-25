@@ -25,7 +25,6 @@ import static com.google.common.collect.Maps.newLinkedHashMap;
 import static java.util.Collections.singleton;
 
 import com.google.common.collect.ImmutableList;
-
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.ItemGroup;
@@ -152,8 +151,7 @@ public class Stage extends AbstractItem {
         return new Stage(name, tasks);
     }
 
-    public static List<Stage> extractStages(AbstractProject firstProject,
-                                            AbstractProject lastProject) throws PipelineException {
+    public static List<Stage> extractStages(AbstractProject firstProject, AbstractProject lastProject) throws PipelineException {
         Map<String, Stage> stages = newLinkedHashMap();
         for (AbstractProject project : ProjectUtil.getAllDownstreamProjects(firstProject, lastProject).values()) {
             Task task = Task.getPrototypeTask(project, project.getFullName().equals(firstProject.getFullName()));

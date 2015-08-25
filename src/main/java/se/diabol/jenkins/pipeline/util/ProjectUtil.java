@@ -63,8 +63,7 @@ public final class ProjectUtil {
      * @see ProjectUtil#getAllDownstreamProjects(hudson.model.AbstractProject, java.util.Map)
      *
      */
-    public static Map<String, AbstractProject<?, ?>> getAllDownstreamProjects(AbstractProject first,
-                                                                              AbstractProject last) {
+    public static Map<String, AbstractProject<?, ?>> getAllDownstreamProjects(AbstractProject first, AbstractProject last) {
         Map<String, AbstractProject<?, ?>> projects = newLinkedHashMap();
         return  getAllDownstreamProjects(first, last, projects);
     }
@@ -80,9 +79,7 @@ public final class ProjectUtil {
      * @param projects Current map of all sub projects.
      * @return A map of all downstream projects.
      */
-    public static Map<String, AbstractProject<?, ?>> getAllDownstreamProjects(AbstractProject first,
-                                                                              AbstractProject last, Map<String,
-            AbstractProject<?, ?>> projects) {
+    public static Map<String, AbstractProject<?, ?>> getAllDownstreamProjects(AbstractProject first, AbstractProject last, Map<String, AbstractProject<?, ?>> projects) {
         if (first == null) {
             return projects;
         }
