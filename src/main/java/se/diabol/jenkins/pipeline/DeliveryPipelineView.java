@@ -61,16 +61,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import javax.servlet.ServletException;
+
 
 @SuppressWarnings("UnusedDeclaration")
 public class DeliveryPipelineView extends View {
@@ -267,6 +266,13 @@ public class DeliveryPipelineView extends View {
                         componentSpec.setFirstJob(newName);
                     }
                 }
+                if (componentSpec.getLastJob() != null && componentSpec.getLastJob().equals(oldName)) {
+                    if (newName == null) {
+                        it.remove();
+                    } else {
+                        componentSpec.setLastJob(newName);
+                    }
+                }
             }
         }
     }
@@ -385,8 +391,10 @@ public class DeliveryPipelineView extends View {
             if (componentSpecs != null) {
                 for (ComponentSpec componentSpec : componentSpecs) {
                     AbstractProject firstJob = ProjectUtil.getProject(componentSpec.getFirstJob(), getOwnerItemGroup());
+                    AbstractProject lastJob = ProjectUtil.getProject(componentSpec.getLastJob(), getOwnerItemGroup());
                     if (firstJob != null) {
-                        components.add(getComponent(componentSpec.getName(), firstJob, showAggregatedPipeline));
+                        components.add(getComponent(componentSpec.getName(), firstJob,
+                                lastJob, showAggregatedPipeline));
                     } else {
                         throw new PipelineException("Could not find project: " + componentSpec.getFirstJob());
                     }
@@ -396,7 +404,7 @@ public class DeliveryPipelineView extends View {
                 for (RegExpSpec regexp : regexpFirstJobs) {
                     Map<String, AbstractProject> matches = ProjectUtil.getProjects(regexp.getRegexp());
                     for (Map.Entry<String, AbstractProject> entry : matches.entrySet()) {
-                        components.add(getComponent(entry.getKey(), entry.getValue(), showAggregatedPipeline));
+                        components.add(getComponent(entry.getKey(), entry.getValue(), null, showAggregatedPipeline));
                     }
                 }
             }
@@ -415,9 +423,9 @@ public class DeliveryPipelineView extends View {
         }
     }
 
-    private Component getComponent(String name, AbstractProject firstJob, boolean showAggregatedPipeline)
-            throws PipelineException {
-        Pipeline pipeline = Pipeline.extractPipeline(name, firstJob);
+    private Component getComponent(String name, AbstractProject firstJob, AbstractProject lastJob,
+                                   boolean showAggregatedPipeline) throws PipelineException {
+        Pipeline pipeline = Pipeline.extractPipeline(name, firstJob, lastJob);
         List<Pipeline> pipelines = new ArrayList<Pipeline>();
         if (showAggregatedPipeline) {
             pipelines.add(pipeline.createPipelineAggregated(getOwnerItemGroup()));
@@ -428,29 +436,7 @@ public class DeliveryPipelineView extends View {
 
     @Override
     public Collection<TopLevelItem> getItems() {
-        List<TopLevelItem> result = new ArrayList<TopLevelItem>();
-        Set<AbstractProject> projects = new HashSet<AbstractProject>();
-        if (componentSpecs != null) {
-            for (ComponentSpec componentSpec : componentSpecs) {
-                projects.add(ProjectUtil.getProject(componentSpec.getFirstJob(), getOwnerItemGroup()));
-            }
-        }
-        if (regexpFirstJobs != null) {
-            for (RegExpSpec regexp : regexpFirstJobs) {
-                Map<String, AbstractProject> projectMap = ProjectUtil.getProjects(regexp.getRegexp());
-                projects.addAll(projectMap.values());
-            }
-
-        }
-        for (AbstractProject project : projects) {
-            Collection<AbstractProject<?, ?>> downstreamProjects =
-                    ProjectUtil.getAllDownstreamProjects(project).values();
-            for (AbstractProject<?, ?> abstractProject : downstreamProjects) {
-                result.add(getItem(abstractProject.getName()));
-            }
-        }
-
-        return result;
+        return (Collection)getOwnerItemGroup().getItems();
     }
 
     @Override
@@ -468,8 +454,6 @@ public class DeliveryPipelineView extends View {
 
     @Override
     public Item doCreateItem(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
-        View allView;
-        
         if (!isDefault()) {
             return getOwner().getPrimaryView().doCreateItem(req, rsp);
         } else {
@@ -571,11 +555,13 @@ public class DeliveryPipelineView extends View {
     public static class ComponentSpec extends AbstractDescribableImpl<ComponentSpec> {
         private String name;
         private String firstJob;
+        private String lastJob;
 
         @DataBoundConstructor
-        public ComponentSpec(String name, String firstJob) {
+        public ComponentSpec(String name, String firstJob, String lastJob) {
             this.name = name;
             this.firstJob = firstJob;
+            this.lastJob = lastJob;
         }
 
         public String getName() {
@@ -590,6 +576,14 @@ public class DeliveryPipelineView extends View {
             this.firstJob = firstJob;
         }
 
+        public String getLastJob() {
+            return lastJob;
+        }
+
+        public void setLastJob(String lastJob) {
+            this.lastJob = lastJob;
+        }
+
         @Extension
         public static class DescriptorImpl extends Descriptor<ComponentSpec> {
 
@@ -600,6 +594,13 @@ public class DeliveryPipelineView extends View {
 
             public ListBoxModel doFillFirstJobItems(@AncestorInPath ItemGroup<?> context) {
                 return ProjectUtil.fillAllProjects(context);
+            }
+
+            public ListBoxModel doFillLastJobItems(@AncestorInPath ItemGroup<?> context) {
+                ListBoxModel options = new ListBoxModel();
+                options.add("");
+                options.addAll(ProjectUtil.fillAllProjects(context));
+                return options;
             }
 
             public FormValidation doCheckName(@QueryParameter String value) {

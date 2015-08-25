@@ -63,9 +63,10 @@ public final class ProjectUtil {
      * @see ProjectUtil#getAllDownstreamProjects(hudson.model.AbstractProject, java.util.Map)
      *
      */
-    public static Map<String, AbstractProject<?, ?>> getAllDownstreamProjects(AbstractProject first) {
+    public static Map<String, AbstractProject<?, ?>> getAllDownstreamProjects(AbstractProject first,
+                                                                              AbstractProject last) {
         Map<String, AbstractProject<?, ?>> projects = newLinkedHashMap();
-        return  getAllDownstreamProjects(first, projects);
+        return  getAllDownstreamProjects(first, last, projects);
     }
 
     /**
@@ -75,12 +76,13 @@ public final class ProjectUtil {
      * and will NOT add. Adding a project that already exists will produce a stack overflow.
      *
      * @param first The first project
+     * @param last The last project to visualize
      * @param projects Current map of all sub projects.
      * @return A map of all downstream projects.
      */
-    public static Map<String, AbstractProject<?, ?>> getAllDownstreamProjects(AbstractProject first, Map<String,
+    public static Map<String, AbstractProject<?, ?>> getAllDownstreamProjects(AbstractProject first,
+                                                                              AbstractProject last, Map<String,
             AbstractProject<?, ?>> projects) {
-
         if (first == null) {
             return projects;
         }
@@ -89,10 +91,15 @@ public final class ProjectUtil {
             return projects;
         }
 
+        if (last != null && first.getFullName().equals(last.getFullName())) {
+            projects.put(last.getFullName(), last);
+            return projects;
+        }
+
         projects.put(first.getFullName(), first);
 
         for (AbstractProject p : getDownstreamProjects(first)) {
-            projects.putAll(getAllDownstreamProjects(p, projects));
+            projects.putAll(getAllDownstreamProjects(p, last, projects));
         }
 
         return projects;
