@@ -186,8 +186,10 @@ public class Pipeline extends AbstractItem {
     /**
      * Created a pipeline prototype for the supplied first project.
      */
-    public static Pipeline extractPipeline(String name, AbstractProject<?, ?> firstProject, AbstractProject<?, ?> lastProject) throws PipelineException {
-        return new Pipeline(name, firstProject, lastProject, newArrayList(Stage.extractStages(firstProject, lastProject)));
+    public static Pipeline extractPipeline(String name, AbstractProject<?, ?> firstProject,
+                                           AbstractProject<?, ?> lastProject) throws PipelineException {
+        return new Pipeline(name, firstProject, lastProject,
+                newArrayList(Stage.extractStages(firstProject, lastProject)));
     }
 
     public static Pipeline extractPipeline(String name, AbstractProject<?, ?> firstProject) throws PipelineException {
@@ -216,7 +218,8 @@ public class Pipeline extends AbstractItem {
             for (Stage stage : getStages()) {
                 pipelineStages.add(stage.createLatestStage(context, null));
             }
-            Pipeline pipelineLatest = new Pipeline(getName(), firstProject, lastProject, "#" + firstProject.getNextBuildNumber(), pipeLineTimestamp,
+            Pipeline pipelineLatest = new Pipeline(getName(), firstProject, lastProject,
+                    "#" + firstProject.getNextBuildNumber(), pipeLineTimestamp,
                     Trigger.getTriggeredBy(firstProject, null), null,
                     pipelineStages, false);
             result.add(pipelineLatest);
@@ -233,8 +236,10 @@ public class Pipeline extends AbstractItem {
             for (Stage stage : getStages()) {
                 pipelineStages.add(stage.createLatestStage(context, firstBuild));
             }
-            Pipeline pipelineLatest = new Pipeline(getName(), firstProject, lastProject, firstBuild.getDisplayName(), pipeLineTimestamp,
-                                Trigger.getTriggeredBy(firstProject, firstBuild), UserInfo.getContributors(firstBuild), pipelineStages, false);
+            Pipeline pipelineLatest = new Pipeline(getName(), firstProject, lastProject, firstBuild.getDisplayName(),
+                    pipeLineTimestamp,
+                                Trigger.getTriggeredBy(firstProject, firstBuild), UserInfo.getContributors(firstBuild),
+                    pipelineStages, false);
             pipelineLatest.setChanges(pipelineChanges);
             pipelineLatest.calculateTotalBuildTime();
             result.add(pipelineLatest);
