@@ -60,7 +60,7 @@ public final class ProjectUtil {
     }
 
     /**
-     * @see ProjectUtil#getAllDownstreamProjects(hudson.model.AbstractProject, java.util.Map)
+     * @see ProjectUtil#getAllDownstreamProjects(hudson.model.AbstractProject, AbstractProject, java.util.Map)
      *
      */
     public static Map<String, AbstractProject<?, ?>> getAllDownstreamProjects(AbstractProject first, AbstractProject last) {
