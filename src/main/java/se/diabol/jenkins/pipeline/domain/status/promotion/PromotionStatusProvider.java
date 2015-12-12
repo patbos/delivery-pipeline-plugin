@@ -34,11 +34,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-
 @Extension(optional = true)
 public class PromotionStatusProvider extends AbstractPromotionStatusProvider {
 
     // Force a classloading error plugin isn't available
+    static final public Class<PromotedBuildAction> CLASS = PromotedBuildAction.class;
     @SuppressWarnings("UnusedDeclaration")
     public static final  Class CLASS = PromotedBuildAction.class;
     static final String DEFAULT_ICON_SIZE = "16x16";
@@ -48,7 +48,7 @@ public class PromotionStatusProvider extends AbstractPromotionStatusProvider {
 
     // public
 
-    public boolean isBuildPromoted(AbstractBuild build) {
+    public boolean isBuildPromoted(AbstractBuild<?, ?> build) {
         final Object action = build.getAction(PromotedBuildAction.class);
         if (action != null) {
             return (CollectionUtils.isNotEmpty(promotedBuildActionWrapper.getPromotions(action)));
@@ -56,7 +56,7 @@ public class PromotionStatusProvider extends AbstractPromotionStatusProvider {
         return false;
     }
 
-    public List<PromotionStatus> getPromotionStatusList(AbstractBuild build) {
+    public List<PromotionStatus> getPromotionStatusList(AbstractBuild<?, ?> build) {
         final List<PromotionStatus> promotionStatusList = new ArrayList<PromotionStatus>();
         final Object action = build.getAction(PromotedBuildAction.class);
         if (action != null) {
@@ -74,8 +74,7 @@ public class PromotionStatusProvider extends AbstractPromotionStatusProvider {
 
     // private
 
-    private PromotionStatus buildNewPromotionStatus(AbstractBuild build, Object status, List<String> params,
-                                                    Object promotionObj) {
+    private PromotionStatus buildNewPromotionStatus(AbstractBuild<?, ?> build, Object status, List<String> params, Object promotionObj) {
         final Promotion promotion = (Promotion) promotionObj;
         final String name = promotionStatusWrapper.getName(status);
         final long startTime = promotion.getStartTimeInMillis();
@@ -105,8 +104,8 @@ public class PromotionStatusProvider extends AbstractPromotionStatusProvider {
         }
     }
 
-    private void sortPromotionStatusListByStartTimeInDescOrder(List promotionStatusList) {
-        Collections.sort(promotionStatusList, new Comparator() {
+    private void sortPromotionStatusListByStartTimeInDescOrder(List<PromotionStatus> promotionStatusList) {
+        Collections.sort(promotionStatusList, new Comparator<Object>() {
             @Override
             public int compare(Object o1, Object o2) {
                 return (int) (promotionStatusWrapper.getStartTime(o2) - promotionStatusWrapper.getStartTime(o1));
@@ -117,13 +116,13 @@ public class PromotionStatusProvider extends AbstractPromotionStatusProvider {
     // Decorators to make code unit-testable
 
     static class PromotedBuildActionWrapper {
-        public List getPromotions(Object action) {
+        public List<Status> getPromotions(Object action) {
             return ((PromotedBuildAction) action).getPromotions();
         }
     }
 
     static class PromotionStatusWrapper {
-        public Collection getPromotionBuilds(Object status) {
+        public Collection<Promotion> getPromotionBuilds(Object status) {
             return ((hudson.plugins.promoted_builds.Status) status).getPromotionBuilds();
         }
 

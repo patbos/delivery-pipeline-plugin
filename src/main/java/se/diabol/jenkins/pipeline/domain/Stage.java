@@ -25,6 +25,9 @@ import static com.google.common.collect.Maps.newLinkedHashMap;
 import static java.util.Collections.singleton;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.ItemGroup;
@@ -41,6 +44,7 @@ import se.diabol.jenkins.pipeline.util.BuildUtil;
 import se.diabol.jenkins.pipeline.util.PipelineUtils;
 import se.diabol.jenkins.pipeline.util.ProjectUtil;
 
+import javax.annotation.CheckForNull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -231,11 +235,11 @@ public class Stage extends AbstractItem {
         CycleDetector<Stage, Edge> cycleDetector = new CycleDetector<Stage, Edge>(graph);
         if (cycleDetector.detectCycles()) {
             Set<Stage> stageSet = cycleDetector.findCycles();
-            String message = "Circular dependencies between stages: ";
+            StringBuilder message = new StringBuilder("Circular dependencies between stages: ");
             for (Stage stage : stageSet) {
-                message += stage.getName() + " ";
+                message.append(stage.getName()).append(" ");
             }
-            throw new PipelineException(message);
+            throw new PipelineException(message.toString());
         }
 
 
@@ -246,14 +250,35 @@ public class Stage extends AbstractItem {
                 return stages2.size() - stages1.size();
             }
         });
-        for (int row = allPaths.size() - 1; row >= 0; row--) {
-            List<Stage> path = allPaths.get(row);
+        
+        //for keeping track of which row has an available column
+        final Map<Integer,Integer> columnRowMap = Maps.newHashMap();
+        final List<Stage> processedStages = Lists.newArrayList();
+        
+        for (int row = 0; row < allPaths.size(); row++) {
+            List<Stage> path = allPaths.get(row);            
             for (int column = 0; column < path.size(); column++) {
                 Stage stage = path.get(column);
-                stage.setColumn(Math.max(stage.getColumn(), column));
-                stage.setRow(row);
+                
+                //skip processed stage since the row/column has already been set
+                if (!processedStages.contains(stage)) {
+	                stage.setColumn(Math.max(stage.getColumn(), column));
+	                
+	                final int effectiveColumn = stage.getColumn();
+	                
+	                final Integer previousRowForThisColumn = columnRowMap.get(effectiveColumn);
+	                //set it to 0 if no previous setting is set; if found, previous value + 1
+	                final int currentRowForThisColumn = previousRowForThisColumn == null ? 0 : previousRowForThisColumn + 1;
+	                //update/set row number in the columnRowMap for this effective column
+	            	columnRowMap.put(effectiveColumn, currentRowForThisColumn);
+	
+	            	stage.setRow(currentRowForThisColumn);
+	            	
+	            	processedStages.add(stage);
+                }
             }
         }
+        
         List<Stage> result = new ArrayList<Stage>(stages);
 
         sortByRowsCols(result);
@@ -328,6 +353,7 @@ public class Stage extends AbstractItem {
         return result;
     }
 
+    @CheckForNull
     protected static Stage findStageForJob(String name, Collection<Stage> stages) {
         for (Stage stage : stages) {
             for (int j = 0; j < stage.getTasks().size(); j++) {
@@ -341,6 +367,7 @@ public class Stage extends AbstractItem {
 
     }
 
+    @CheckForNull
     private AbstractBuild getHighestBuild(List<Task> tasks, AbstractProject firstProject, ItemGroup context) {
         int highest = -1;
         for (Task task : tasks) {
@@ -358,6 +385,7 @@ public class Stage extends AbstractItem {
         }
     }
 
+    @CheckForNull
     private AbstractBuild getFirstUpstreamBuild(AbstractProject<?, ?> project, AbstractProject<?, ?> first) {
         RunList<? extends AbstractBuild> builds = project.getBuilds();
         for (AbstractBuild build : builds) {

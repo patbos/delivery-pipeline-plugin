@@ -24,13 +24,13 @@ import hudson.model.Job;
 import hudson.model.JobProperty;
 import hudson.model.JobPropertyDescriptor;
 import hudson.util.FormValidation;
-import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
 
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.export.Exported;
+import se.diabol.jenkins.pipeline.util.JenkinsUtil;
 
 import java.util.HashSet;
 import java.util.List;
@@ -80,7 +80,7 @@ public class PipelineProperty extends JobProperty<AbstractProject<?, ?>> {
     }
 
     public static Set<String> getStageNames() {
-        List<AbstractProject> projects = Jenkins.getInstance().getAllItems(AbstractProject.class);
+        List<AbstractProject> projects = JenkinsUtil.getInstance().getAllItems(AbstractProject.class);
         Set<String> result = new HashSet<String>();
         for (AbstractProject project : projects) {
             PipelineProperty property = (PipelineProperty) project.getProperty(PipelineProperty.class);

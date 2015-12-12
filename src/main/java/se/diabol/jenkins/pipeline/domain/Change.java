@@ -85,7 +85,7 @@ public class Change {
                             + build.getProject().getFullDisplayName() + " " + build.getDisplayName(), e);
                 }
             }
-            result.add(new Change(user, entry.getMsg(), entry.getCommitId(), changeLink));
+            result.add(new Change(user, entry.getMsgAnnotated(), entry.getCommitId(), changeLink));
         }
         return result;
     }

@@ -15,32 +15,27 @@ You should have received a copy of the GNU General Public License
 along with Delivery Pipeline Plugin.
 If not, see <http://www.gnu.org/licenses/>.
 */
-package se.diabol.jenkins.pipeline.sort;
+package se.diabol.jenkins.pipeline.resolver;
 
 import hudson.Extension;
-import se.diabol.jenkins.pipeline.domain.Component;
+import hudson.model.Cause;
+import hudson.plugins.git.GitStatus;
 
-import java.io.Serializable;
+import se.diabol.jenkins.pipeline.CauseResolver;
+import se.diabol.jenkins.pipeline.domain.TriggerCause;
 
-public class NameComparator extends ComponentComparator implements Serializable {
+@Extension(optional = true)
+public class GitCauseResolver extends CauseResolver {
+
+    // Force a classloading error plugin isn't available
+    @SuppressWarnings("UnusedDeclaration")
+    public static final Class CLASS = GitStatus.CommitHookCause.class;
 
     @Override
-    public int compare(Component o1, Component o2) {
-        return o1.getName().compareTo(o2.getName());
-    }
-
-    @Extension
-    public static class DescriptorImpl extends ComponentComparatorDescriptor {
-        @Override
-        public String getDisplayName() {
-            return "Sort by title";
+    public TriggerCause resolveCause(Cause cause) {
+        if (cause instanceof GitStatus.CommitHookCause) {
+            return new TriggerCause(TriggerCause.TYPE_SCM, "SCM");
         }
-
-        @Override
-        public ComponentComparator createInstance() {
-            return new NameComparator();
-        }
+        return null;
     }
-
-
 }
