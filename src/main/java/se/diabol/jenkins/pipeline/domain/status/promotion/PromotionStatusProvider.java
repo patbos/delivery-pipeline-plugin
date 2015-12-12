@@ -33,14 +33,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import se.diabol.jenkins.pipeline.domain.status.Status;
 
 @Extension(optional = true)
 public class PromotionStatusProvider extends AbstractPromotionStatusProvider {
 
-    // Force a classloading error plugin isn't available
-    static final public Class<PromotedBuildAction> CLASS = PromotedBuildAction.class;
     @SuppressWarnings("UnusedDeclaration")
-    public static final  Class CLASS = PromotedBuildAction.class;
+    public static final Class CLASS = PromotedBuildAction.class;
     static final String DEFAULT_ICON_SIZE = "16x16";
 
     private PromotionStatusWrapper promotionStatusWrapper = new PromotionStatusWrapper();
@@ -55,6 +54,7 @@ public class PromotionStatusProvider extends AbstractPromotionStatusProvider {
         }
         return false;
     }
+
 
     public List<PromotionStatus> getPromotionStatusList(AbstractBuild<?, ?> build) {
         final List<PromotionStatus> promotionStatusList = new ArrayList<PromotionStatus>();
@@ -116,7 +116,7 @@ public class PromotionStatusProvider extends AbstractPromotionStatusProvider {
     // Decorators to make code unit-testable
 
     static class PromotedBuildActionWrapper {
-        public List<Status> getPromotions(Object action) {
+        public List getPromotions(Object action) {
             return ((PromotedBuildAction) action).getPromotions();
         }
     }
