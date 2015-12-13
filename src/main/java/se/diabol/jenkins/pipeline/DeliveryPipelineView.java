@@ -328,8 +328,7 @@ public class DeliveryPipelineView extends View {
         return showStaticAnalysisResults;
     }
 
-    public void setShowDescription(boolean showDescription)
-    {
+    public void setShowDescription(boolean showDescription) {
         this.showDescription = showDescription;
     }
 

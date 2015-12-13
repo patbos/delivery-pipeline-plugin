@@ -25,9 +25,9 @@ import hudson.tasks.Publisher;
 import hudson.util.DescribableList;
 import se.diabol.jenkins.pipeline.util.ProjectUtil;
 
-import javax.annotation.CheckForNull;
 import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.CheckForNull;
 
 @Extension(optional = true)
 public class BPPManualTriggerResolver extends ManualTriggerResolver {

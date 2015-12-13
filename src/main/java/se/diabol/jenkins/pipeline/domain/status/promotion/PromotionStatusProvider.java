@@ -25,6 +25,7 @@ import hudson.model.ParameterValue;
 import hudson.model.StringParameterValue;
 import hudson.plugins.promoted_builds.PromotedBuildAction;
 import hudson.plugins.promoted_builds.Promotion;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 
@@ -33,7 +34,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import se.diabol.jenkins.pipeline.domain.status.Status;
 
 @Extension(optional = true)
 public class PromotionStatusProvider extends AbstractPromotionStatusProvider {
@@ -74,7 +74,8 @@ public class PromotionStatusProvider extends AbstractPromotionStatusProvider {
 
     // private
 
-    private PromotionStatus buildNewPromotionStatus(AbstractBuild<?, ?> build, Object status, List<String> params, Object promotionObj) {
+    private PromotionStatus buildNewPromotionStatus(AbstractBuild<?, ?> build, Object status,
+                                                    List<String> params, Object promotionObj) {
         final Promotion promotion = (Promotion) promotionObj;
         final String name = promotionStatusWrapper.getName(status);
         final long startTime = promotion.getStartTimeInMillis();

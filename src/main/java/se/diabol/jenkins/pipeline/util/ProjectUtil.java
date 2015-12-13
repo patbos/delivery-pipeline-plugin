@@ -152,7 +152,9 @@ public final class ProjectUtil {
                     AbstractBuild upstreamBuild = BuildUtil.match(upstreamProject.getBuilds(), firstBuild);
                     if (upstreamBuild != null) {
                         for (Cause.UpstreamCause upstreamCause : causes) {
-                            if (upstreamBuild.getNumber() == upstreamCause.getUpstreamBuild() && upstreamProject.getRelativeNameFrom(JenkinsUtil.getInstance()).equals(upstreamCause.getUpstreamProject())) {
+                            if (upstreamBuild.getNumber() == upstreamCause.getUpstreamBuild()
+                                    && upstreamProject.getRelativeNameFrom(JenkinsUtil.getInstance())
+                                    .equals(upstreamCause.getUpstreamProject())) {
                                 return true;
                             }
 

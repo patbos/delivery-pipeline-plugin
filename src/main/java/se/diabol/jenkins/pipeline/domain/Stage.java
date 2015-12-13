@@ -44,7 +44,6 @@ import se.diabol.jenkins.pipeline.util.BuildUtil;
 import se.diabol.jenkins.pipeline.util.PipelineUtils;
 import se.diabol.jenkins.pipeline.util.ProjectUtil;
 
-import javax.annotation.CheckForNull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -54,6 +53,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import javax.annotation.CheckForNull;
 
 @ExportedBean(defaultVisibility = AbstractItem.VISIBILITY)
 public class Stage extends AbstractItem {
@@ -262,19 +263,20 @@ public class Stage extends AbstractItem {
                 
                 //skip processed stage since the row/column has already been set
                 if (!processedStages.contains(stage)) {
-	                stage.setColumn(Math.max(stage.getColumn(), column));
-	                
-	                final int effectiveColumn = stage.getColumn();
-	                
-	                final Integer previousRowForThisColumn = columnRowMap.get(effectiveColumn);
-	                //set it to 0 if no previous setting is set; if found, previous value + 1
-	                final int currentRowForThisColumn = previousRowForThisColumn == null ? 0 : previousRowForThisColumn + 1;
-	                //update/set row number in the columnRowMap for this effective column
-	            	columnRowMap.put(effectiveColumn, currentRowForThisColumn);
-	
-	            	stage.setRow(currentRowForThisColumn);
-	            	
-	            	processedStages.add(stage);
+                    stage.setColumn(Math.max(stage.getColumn(), column));
+
+                    final int effectiveColumn = stage.getColumn();
+
+                    final Integer previousRowForThisColumn = columnRowMap.get(effectiveColumn);
+                    //set it to 0 if no previous setting is set; if found, previous value + 1
+                    final int currentRowForThisColumn = previousRowForThisColumn == null ? 0 :
+                            previousRowForThisColumn + 1;
+                    //update/set row number in the columnRowMap for this effective column
+                    columnRowMap.put(effectiveColumn, currentRowForThisColumn);
+
+                    stage.setRow(currentRowForThisColumn);
+
+                    processedStages.add(stage);
                 }
             }
         }
