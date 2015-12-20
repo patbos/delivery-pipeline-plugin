@@ -219,7 +219,7 @@ function refreshPipelines(data, divNames, errorDiv, view, showAvatars, showChang
             Q.each(component.pipelines, function (j, pipeline) {
                 index = j;
                 Q.each(pipeline.stages, function (k, stage) {
-                    if (stage.downstreamStages) {
+                    if (stage.downstreamStageIds) {
                         Q.each(stage.downstreamStageIds, function (l, value) {
                             source = getStageId(stage.id + "", index);
                             target = getStageId(value + "", index);
