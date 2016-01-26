@@ -207,7 +207,7 @@ public class Pipeline extends AbstractItem {
      * Populates and return pipelines for the supplied pipeline prototype with the current status.
      *
      * @param noOfPipelines number of pipeline instances
-     * @param showUpstream
+     * @param showUpstream should show upstream builds if any
      */
     public List<Pipeline> createPipelineLatest(int noOfPipelines, ItemGroup context, boolean showUpstream) throws PipelineException {
         List<Pipeline> result = new ArrayList<Pipeline>();
