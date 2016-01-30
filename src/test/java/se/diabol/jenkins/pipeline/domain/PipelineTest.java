@@ -708,10 +708,15 @@ public class PipelineTest {
     }
 
     private Pipeline createPipelineLatest(Pipeline pipeline, ItemGroup itemGroup) throws PipelineException {
-        List<Pipeline> pipelines = pipeline.createPipelineLatest(1, itemGroup, false);
+        return createPipelineLatest(pipeline, itemGroup, false);
+    }
+
+    private Pipeline createPipelineLatest(Pipeline pipeline, ItemGroup itemGroup, boolean upstream) throws PipelineException {
+        List<Pipeline> pipelines = pipeline.createPipelineLatest(1, itemGroup, upstream);
         assertFalse(pipelines.isEmpty());
         return pipelines.get(0);
     }
+
 
     @Test
     public void testCalculatePipelineRoutesSimpleRoute() throws Exception {
@@ -816,6 +821,26 @@ public class PipelineTest {
         Pipeline pipeline = new Pipeline("NoStages", project, null, new ArrayList<Stage>());
         pipeline.calculateTotalBuildTime();
         assertEquals(0L, pipeline.getTotalBuildTime());
+    }
+
+
+
+    @Test
+    public void testShowUpstream() throws Exception {
+        FreeStyleProject upstream = jenkins.createFreeStyleProject("upstream");
+        FreeStyleProject build = jenkins.createFreeStyleProject("build");
+        FreeStyleProject deploy = jenkins.createFreeStyleProject("deploy");
+
+        upstream.getPublishersList().add(new hudson.plugins.parameterizedtrigger.BuildTrigger(new BuildTriggerConfig("build", ResultCondition.SUCCESS, new ArrayList<AbstractBuildParameterFactory>())));
+        build.getPublishersList().add(new hudson.plugins.parameterizedtrigger.BuildTrigger(new BuildTriggerConfig("deploy", ResultCondition.SUCCESS, new ArrayList<AbstractBuildParameterFactory>())));
+
+        jenkins.getInstance().rebuildDependencyGraph();
+
+        jenkins.buildAndAssertSuccess(upstream);
+
+        Pipeline pipeline = Pipeline.extractPipeline("Pipeline", build);
+        pipeline = createPipelineLatest(pipeline, jenkins.getInstance(), true);
+        assertEquals(3, pipeline.getStages().size());
     }
 
 }
