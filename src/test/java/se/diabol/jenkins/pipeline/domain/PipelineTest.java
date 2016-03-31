@@ -418,7 +418,7 @@ public class PipelineTest {
 
         assertEquals(build.getLastBuild(), BuildUtil.getFirstUpstreamBuild(build.getLastBuild(), build));
         Pipeline pipeline = Pipeline.extractPipeline("Pipeline", build);
-        List<Pipeline> pipelines = pipeline.createPipelineLatest(1, Jenkins.getInstance());
+        List<Pipeline> pipelines = pipeline.createPipelineLatest(1, Jenkins.getInstance(), false);
         assertEquals(1, pipelines.size());
         assertEquals(1, pipelines.get(0).getTriggeredBy().size());
         assertEquals(TriggerCause.TYPE_UPSTREAM, pipelines.get(0).getTriggeredBy().get(0).getType());
@@ -701,17 +701,22 @@ public class PipelineTest {
         FreeStyleProject a = jenkins.createFreeStyleProject("A");
         Pipeline prototype = Pipeline.extractPipeline("Pipe", a);
         a.scheduleBuild(2, new Cause.UserIdCause());
-        List<Pipeline> pipelines = prototype.createPipelineLatest(5, Jenkins.getInstance());
+        List<Pipeline> pipelines = prototype.createPipelineLatest(5, Jenkins.getInstance(), false);
         assertEquals(1, pipelines.size());
 
 
     }
 
-    private Pipeline createPipelineLatest(Pipeline pipeline, ItemGroup itemGroup) {
-        List<Pipeline> pipelines = pipeline.createPipelineLatest(1, itemGroup);
+    private Pipeline createPipelineLatest(Pipeline pipeline, ItemGroup itemGroup) throws PipelineException {
+        return createPipelineLatest(pipeline, itemGroup, false);
+    }
+
+    private Pipeline createPipelineLatest(Pipeline pipeline, ItemGroup itemGroup, boolean upstream) throws PipelineException {
+        List<Pipeline> pipelines = pipeline.createPipelineLatest(1, itemGroup, upstream);
         assertFalse(pipelines.isEmpty());
         return pipelines.get(0);
     }
+
 
     @Test
     public void testCalculatePipelineRoutesSimpleRoute() throws Exception {
@@ -816,6 +821,26 @@ public class PipelineTest {
         Pipeline pipeline = new Pipeline("NoStages", project, null, new ArrayList<Stage>());
         pipeline.calculateTotalBuildTime();
         assertEquals(0L, pipeline.getTotalBuildTime());
+    }
+
+
+
+    @Test
+    public void testShowUpstream() throws Exception {
+        FreeStyleProject upstream = jenkins.createFreeStyleProject("upstream");
+        FreeStyleProject build = jenkins.createFreeStyleProject("build");
+        FreeStyleProject deploy = jenkins.createFreeStyleProject("deploy");
+
+        upstream.getPublishersList().add(new hudson.plugins.parameterizedtrigger.BuildTrigger(new BuildTriggerConfig("build", ResultCondition.SUCCESS, new ArrayList<AbstractBuildParameterFactory>())));
+        build.getPublishersList().add(new hudson.plugins.parameterizedtrigger.BuildTrigger(new BuildTriggerConfig("deploy", ResultCondition.SUCCESS, new ArrayList<AbstractBuildParameterFactory>())));
+
+        jenkins.getInstance().rebuildDependencyGraph();
+
+        jenkins.buildAndAssertSuccess(upstream);
+
+        Pipeline pipeline = Pipeline.extractPipeline("Pipeline", build);
+        pipeline = createPipelineLatest(pipeline, jenkins.getInstance(), true);
+        assertEquals(3, pipeline.getStages().size());
     }
 
     @Test
