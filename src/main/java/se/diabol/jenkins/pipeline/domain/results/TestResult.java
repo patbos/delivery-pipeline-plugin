@@ -18,7 +18,7 @@ If not, see <http://www.gnu.org/licenses/>.
 package se.diabol.jenkins.pipeline.domain.results;
 
 import hudson.model.AbstractBuild;
-import hudson.tasks.junit.TestResultAction;
+import hudson.tasks.test.AbstractTestResultAction;
 import hudson.tasks.test.AggregatedTestResultAction;
 
 import java.util.ArrayList;
@@ -70,7 +70,7 @@ public class TestResult extends Result {
                             mvn.getTotalCount()));
             } else {
                 /* FreestyleProject */
-                TestResultAction freestyle = build.getAction(TestResultAction.class);
+                AbstractTestResultAction freestyle = build.getAction(AbstractTestResultAction.class);
                 if (freestyle != null) {
                     result.add(new TestResult(
                                 freestyle.getDisplayName(),
