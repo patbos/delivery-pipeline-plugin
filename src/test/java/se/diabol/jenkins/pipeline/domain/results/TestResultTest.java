@@ -24,6 +24,7 @@ import static org.mockito.Mockito.when;
 import hudson.model.FreeStyleBuild;
 import hudson.model.AbstractBuild;
 import hudson.tasks.junit.TestResultAction;
+import hudson.tasks.test.AbstractTestResultAction;
 import hudson.tasks.test.AggregatedTestResultAction;
 
 import java.util.List;
@@ -55,7 +56,7 @@ public class TestResultTest {
     public void testGetTestResultFreeStyleBuild() {
         FreeStyleBuild build =  mock(FreeStyleBuild.class);
         TestResultAction action = mock(TestResultAction.class);
-        when(build.getAction(TestResultAction.class)).thenReturn(action);
+        when(build.getAction(AbstractTestResultAction.class)).thenReturn(action);
 
         List<TestResult> result = TestResult.getResults(build);
         assertNotNull(result);
