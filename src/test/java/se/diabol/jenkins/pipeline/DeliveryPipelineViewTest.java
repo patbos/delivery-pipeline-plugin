@@ -75,9 +75,6 @@ import se.diabol.jenkins.pipeline.sort.NameComparator;
 import se.diabol.jenkins.pipeline.trigger.TriggerException;
 import au.com.centrumsystems.hudson.plugin.buildpipeline.trigger.BuildPipelineTrigger;
 
-import com.gargoylesoftware.htmlunit.html.HtmlForm;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
-
 @RunWith(MockitoJUnitRunner.class)
 public class DeliveryPipelineViewTest {
 
@@ -589,29 +586,6 @@ public class DeliveryPipelineViewTest {
         final String exceptionMessage = DeliveryPipelineView.triggerExceptionMessage(projectNameWithFolderPrefix, "upstream", "1");
         assertTrue(exceptionMessage.contains(projectNameWithFolderPrefix));
         assertTrue(exceptionMessage.contains("Did you mean to specify " + projectName + "?"));
-    }
-
-    @Test
-    public void testDoCreateItem() throws Exception {
-        testDoCreateItem("testDoCreateItem", "");
-
-        DeliveryPipelineView view = new DeliveryPipelineView("Delivery Pipeline");
-        jenkins.getInstance().addView(view);
-        
-        testDoCreateItem("testDoCreateItemAsTheDefaultViewFromTheViewUrl", "view/Delivery%20Pipeline/");
-
-        jenkins.getInstance().setPrimaryView(view);
-        testDoCreateItem("testDoCreateItemAsTheDefaultView", "");
-    }
-
-    private void testDoCreateItem(String projectName, String baseUrl) throws Exception {
-        HtmlPage page = jenkins.createWebClient().goTo(baseUrl + "newJob");
-        HtmlForm form = page.getFormByName("createItem");
-        form.getInputByName("name").setValueAttribute(projectName);
-        form.getRadioButtonsByName("mode").get(0).setChecked(true);
-        jenkins.submit(form);
-        
-        assertTrue(jenkins.jenkins.getJobNames().contains(projectName));
     }
 
     @Test
