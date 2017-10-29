@@ -35,7 +35,6 @@ import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.MockFolder;
 import se.diabol.jenkins.pipeline.test.FakeRepositoryBrowserSCM;
 import se.diabol.jenkins.pipeline.test.MeanFakeRepositoryBrowserSCM;
-import se.diabol.jenkins.pipeline.test.ParentAwareSCM;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -106,27 +105,6 @@ public class ChangeTest {
         assertEquals("http://somewhere.com/test-user", change.getChangeLink());
     }
 
-    @Test
-    public void testGetChangesWithAnnotator() throws Exception {
-        ChangeLogAnnotator.all().add(new ChangeLogAnnotator() {
-            @Override
-            public void annotate(AbstractBuild<?, ?> build, ChangeLogSet.Entry change, MarkupText text) {
-                text.addMarkup(0, "Something huge: ");
-            }
-        });
-        FreeStyleProject project = jenkins.createFreeStyleProject("build");
-        ParentAwareSCM scm = new ParentAwareSCM();
-        scm.addChange().withAuthor("test-user").withMsg("Fixed bug");
-        project.setScm(scm);
-        jenkins.setQuietPeriod(0);
-        jenkins.buildAndAssertSuccess(project);
-        AbstractBuild build = project.getLastBuild();
-        List<Change> changes = Change.getChanges(build);
-        assertNotNull(changes);
-        assertEquals(1, changes.size());
-        Change change = changes.get(0);
-        assertEquals("Something huge: Fixed bug", change.getMessage());
-    }
 
     @Test
     public void testGetChangesWithBrowserThrowIOException() throws Exception {
